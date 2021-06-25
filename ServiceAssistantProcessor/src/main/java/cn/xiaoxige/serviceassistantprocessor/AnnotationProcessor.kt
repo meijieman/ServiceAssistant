@@ -28,8 +28,9 @@ class AnnotationProcessor : AbstractProcessor() {
     private val mNeedInjectedInfo = mutableMapOf<String, Pair<String, Boolean>>()
 
     override fun init(p0: ProcessingEnvironment?) {
+        requireNotNull(p0){"p0 cannot be null"}
         super.init(p0)
-        this.mElementUtils = p0!!.elementUtils
+        this.mElementUtils = p0.elementUtils
         this.mFiler = p0.filer
         this.mMessage = p0.messager
         this.mTypeUtils = p0.typeUtils

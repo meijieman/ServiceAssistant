@@ -1,11 +1,11 @@
 package cn.xiaoxige.serviceassistant
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import cn.xiaoxige.accountapi.IAccountAbilityApi
 import cn.xiaoxige.loginapi.ILoginAbilityApi
 import cn.xiaoxige.loginapi.IUserInfoApi
@@ -38,7 +38,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         tvDesc.text = "未登录"
-        if (Service.getService(IUserInfoApi::class.java)?.isLogin() == true) {
+        val userInfoApi = Service.getService(IUserInfoApi::class.java)
+        requireNotNull(userInfoApi) { "IUserInfoApi is null" }
+        if (userInfoApi.isLogin()) {
             tvDesc.text = "已登录"
         }
 
