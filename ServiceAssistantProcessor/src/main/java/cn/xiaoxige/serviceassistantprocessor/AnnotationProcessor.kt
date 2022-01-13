@@ -28,12 +28,14 @@ class AnnotationProcessor : AbstractProcessor() {
     private val mNeedInjectedInfo = mutableMapOf<String, Pair<String, Boolean>>()
 
     override fun init(p0: ProcessingEnvironment?) {
-        requireNotNull(p0){"p0 cannot be null"}
+        requireNotNull(p0) { "p0 cannot be null" }
         super.init(p0)
-        this.mElementUtils = p0.elementUtils
-        this.mFiler = p0.filer
-        this.mMessage = p0.messager
-        this.mTypeUtils = p0.typeUtils
+        p0.run {
+            mElementUtils = elementUtils
+            mFiler = filer
+            mMessage = messager
+            mTypeUtils = typeUtils
+        }
         i("Service Assistant AnnotationProcessor init")
     }
 
@@ -48,7 +50,9 @@ class AnnotationProcessor : AbstractProcessor() {
     }
 
     override fun process(p0: MutableSet<out TypeElement>?, p1: RoundEnvironment?): Boolean {
-        if (p0 == null || p0.isEmpty()) return false
+        if (p0 == null || p0.isEmpty()) {
+            return false
+        }
         p0.forEach { element ->
             if (element.qualifiedName.contentEquals(NeedInjected::class.java.canonicalName)) {
                 // NeedInjected
@@ -61,31 +65,29 @@ class AnnotationProcessor : AbstractProcessor() {
 
                     // NeedInjected 的类不能是抽象和私有的和可继承的
                     val modifiers = it.modifiers
-                    if (modifiers.contains(Modifier.ABSTRACT) || modifiers.contains(Modifier.PRIVATE) || modifiers.contains(
-                            Modifier.PROTECTED
-                        )
-                    ) {
+                    if (modifiers.contains(Modifier.ABSTRACT) || modifiers.contains(Modifier.PRIVATE)
+                            || modifiers.contains(Modifier.PROTECTED)) {
                         e("NeedInjected class can not abstract or private or protected.")
                         return false
                     }
 
-                    if (handleNeedInjected(it as TypeElement).not()) return false
+                    if (!handleNeedInjected(it as TypeElement)) {
+                        return false
+                    }
                 }
             }
         }
 
+        // 打印注册集合
         mNeedInjectedInfo.keys.forEach {
+            // FIXME: 2021/6/25 这个return 啥意思？
             val value = mNeedInjectedInfo[it] ?: return@forEach
             i("NeedInjected: $it -> ${value.first} --> ${value.second}")
         }
 
+        // 生成注册信息
         mNeedInjectedInfo.keys.forEach {
-            val value = mNeedInjectedInfo[it]
-            AutoWriteInjectedInfoProducer(
-                it,
-                value,
-                mFiler
-            ).write()
+            AutoWriteInjectedInfoProducer(it, mNeedInjectedInfo[it], mFiler, mMessage).write()
         }
 
         // 写完进行清理下
@@ -94,9 +96,7 @@ class AnnotationProcessor : AbstractProcessor() {
         return true
     }
 
-    private fun handleNeedInjected(
-        needInjected: TypeElement
-    ): Boolean {
+    private fun handleNeedInjected(needInjected: TypeElement): Boolean {
         val interfaces = needInjected.interfaces
         if (interfaces.isEmpty() || interfaces.size > 1) {
             e("Currently, only one interface injection is supported")
@@ -108,18 +108,19 @@ class AnnotationProcessor : AbstractProcessor() {
         return true
     }
 
+    companion object{
+        private const val TAG = "AnnotationProcessor >>>"
+
+    }
     private fun i(msg: String) {
-        mMessage.printMessage(Diagnostic.Kind.NOTE, "Service Assistant Processor >>> $msg")
+        mMessage.printMessage(Diagnostic.Kind.NOTE, "$TAG $msg\r\n")
     }
 
-    private fun w(msg: String) {
-        mMessage.printMessage(
-            Diagnostic.Kind.MANDATORY_WARNING,
-            "Service Assistant Processor >>> $msg"
-        )
-    }
+    private fun w(msg: String) =
+            mMessage.printMessage(Diagnostic.Kind.MANDATORY_WARNING, "$TAG $msg\r\n")
+
 
     private fun e(msg: String) {
-        mMessage.printMessage(Diagnostic.Kind.ERROR, "Service Assistant Processor >>> $msg")
+        mMessage.printMessage(Diagnostic.Kind.ERROR, "$TAG $msg\r\n")
     }
 }

@@ -7,9 +7,9 @@ buildscript {
         maven {
             url uri('./plugin')
         }
-        maven {
-            url "https://gitee.com/xiaoxigexiaoan/warehouse/raw/master"
-        }
+//        maven {
+//            url "https://gitee.com/xiaoxigexiaoan/warehouse/raw/master"
+//        }
         google()
         jcenter()
     }
@@ -31,6 +31,9 @@ allprojects {
         }
         maven {
             url "https://gitee.com/xiaoxigexiaoan/warehouse/raw/master"
+        }
+        maven {
+            url "http://cp01-duerosauto-client-maven-mgt123456.bcc-bdbl.baidu.com:8081/content/repositories/auto-mainline/"
         }
         google()
         jcenter()

@@ -8,5 +8,5 @@ package cn.xiaoxige.serviceassistantannotation
  * desc: 需要注入类的注解
  */
 @Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.SOURCE)
 annotation class NeedInjected(val isSingleCase: Boolean = true)

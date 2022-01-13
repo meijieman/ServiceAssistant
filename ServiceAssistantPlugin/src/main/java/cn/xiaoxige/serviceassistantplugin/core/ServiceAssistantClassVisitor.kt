@@ -71,7 +71,7 @@ class ServiceAssistantClassVisitor(
             if (name == null) throw  RuntimeException("Failed to get injection variable name.")
             if (descriptor == null) throw RuntimeException("Failed to get injection variable type.")
             this.mFieldInfo[name] = descriptor
-            Logger.i("injected: $name -> $descriptor")
+            Logger.w("injected: $name -> $descriptor")
 
             if (!this.mIsInsertInitField) {
                 cv.visitField(

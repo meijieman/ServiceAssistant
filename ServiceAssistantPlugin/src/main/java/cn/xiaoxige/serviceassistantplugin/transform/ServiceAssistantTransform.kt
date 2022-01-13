@@ -8,11 +8,11 @@ import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
 import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.io.IOUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
-import org.apache.commons.io.IOUtils
 import java.util.zip.ZipEntry
 
 /**
@@ -69,7 +69,7 @@ class ServiceAssistantTransform : Transform() {
     override fun transform(transformInvocation: TransformInvocation?) {
         super.transform(transformInvocation)
         val startTime = System.currentTimeMillis()
-        Logger.i("Service Assistant start run")
+        Logger.w("Service Assistant start run")
 
         val inputs = transformInvocation?.inputs ?: return
         val outputProvider = transformInvocation.outputProvider
@@ -78,7 +78,6 @@ class ServiceAssistantTransform : Transform() {
         outputProvider?.deleteAll()
 
         inputs.forEach {
-
             it.jarInputs.forEach { jarInput ->
                 handleJarInput(jarInput, outputProvider)
             }
@@ -88,9 +87,9 @@ class ServiceAssistantTransform : Transform() {
             }
         }
 
-        Logger.i("scan info: ")
+        Logger.w("scan info: ")
         mNeedScanClassInfo.forEach {
-            Logger.i("${it.first} -> ${it.second}")
+            Logger.w("${it.first} -> ${it.second}")
         }
 
         if (mServiceFile == null || !mServiceFile!!.name.endsWith(".jar")) {
@@ -100,7 +99,7 @@ class ServiceAssistantTransform : Transform() {
             handleServiceInsertCode(mServiceFile!!)
         }
 
-        Logger.i("Service Assistant finish, current cost time: ${System.currentTimeMillis() - startTime} ms")
+        Logger.w("Service Assistant finish, current cost time: ${System.currentTimeMillis() - startTime} ms")
     }
 
     private fun handleDirInput(
@@ -143,9 +142,12 @@ class ServiceAssistantTransform : Transform() {
         jarInput: JarInput?,
         outputProvider: TransformOutputProvider
     ) {
-        if (jarInput == null) return
+        if (jarInput == null) {
+            return
+        }
         val file = jarInput.file ?: return
         if (!file.absolutePath.endsWith(".jar")) return
+
         var name = jarInput.name
         if (name.endsWith(".jar")) {
             name = name.substring(0, name.length - 4)
@@ -176,9 +178,9 @@ class ServiceAssistantTransform : Transform() {
                         && jarName != "R.class"
                         && jarName != "BuildConfig.class"
                     ) {
-                        ServiceAssistantClassVisitor(IOUtils.toByteArray(it), {
-                            mServiceFile = dest
-                        }) { targetInterface, targetClass ->
+                        ServiceAssistantClassVisitor(
+                            IOUtils.toByteArray(it),
+                            { mServiceFile = dest }) { targetInterface, targetClass ->
                             mNeedScanClassInfo.add(Pair(targetInterface, targetClass))
                         }.visitor()
                     } else {

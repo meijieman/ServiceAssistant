@@ -12,7 +12,9 @@ java {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    // gradle sdk
     implementation gradleApi()
+    // groovy sdk
     implementation localGroovy()
 
     implementation 'com.android.tools.build:gradle:4.1.2'

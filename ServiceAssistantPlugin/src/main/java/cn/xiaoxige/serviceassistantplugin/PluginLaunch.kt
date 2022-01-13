@@ -6,7 +6,6 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.internal.artifacts.transform.Transformer
 
 /**
  * @author xiaoxige
@@ -25,7 +24,7 @@ class PluginLaunch : Plugin<Project> {
         // 初始化日志工具
         Logger.make(project)
 
-        Logger.i("service assistant plugin install. -> ${project.name}")
+        Logger.w("service assistant plugin install. -> ${project.name}")
 
         val appExtension = project.extensions.getByType(AppExtension::class.java)
         appExtension.registerTransform(ServiceAssistantTransform())

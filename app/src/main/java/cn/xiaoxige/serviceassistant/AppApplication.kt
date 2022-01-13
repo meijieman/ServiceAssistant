@@ -4,6 +4,7 @@ import android.app.Application
 import cn.xiaoxige.accountapi.IAccountComponentInitApi
 import cn.xiaoxige.loginapi.ILoginComponentInitApi
 import cn.xiaoxige.serviceassistantcore.Service
+import com.baidu.che.codriver.xlog.XLog
 
 /**
  * @author xiaoxige
@@ -17,7 +18,7 @@ class AppApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
+        XLog.init(this)
         sApplication = this
 
         // 进行登录组件的初始化

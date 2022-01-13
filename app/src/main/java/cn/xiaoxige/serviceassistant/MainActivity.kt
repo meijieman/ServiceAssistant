@@ -15,8 +15,13 @@ import cn.xiaoxige.serviceassistant.repo.IAboutRepo
 import cn.xiaoxige.serviceassistant.repo.ISettingRepo
 import cn.xiaoxige.serviceassistantannotation.Injected
 import cn.xiaoxige.serviceassistantcore.Service
+import com.baidu.che.codriver.xlog.XLog
 
 class MainActivity : AppCompatActivity() {
+
+    companion object{
+        private const val TAG = "MainActivity"
+    }
 
     private val tvDesc by lazy {
         findViewById<TextView>(R.id.tvDesc)
@@ -37,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        XLog.w(TAG, "当前 line:45")
         tvDesc.text = "未登录"
         val userInfoApi = Service.getService(IUserInfoApi::class.java)
         requireNotNull(userInfoApi) { "IUserInfoApi is null" }
@@ -47,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         registerListener()
 
         Toast.makeText(this, mAboutRepo.getAboutInfo(), Toast.LENGTH_SHORT).show()
-        Log.e("TAG", mSettingRepo.getSettingInfo())
+        Log.e(TAG, mSettingRepo.getSettingInfo())
 //        Log.e("TAG", mAccountRepo.getAccountData())
 
         // 列如 fragment 一般做法， 这里点到为止
